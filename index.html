@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App de Comunicação CAA + Macros</title>
+    <title>App de Comunicação CAA + Macros por Categoria</title>
     <style>
         * {
             box-sizing: border-box;
@@ -28,7 +28,7 @@
             text-align: center;
         }
 
-        /* Container Principal Layout */
+        /* Container Principal */
         .container-app {
             display: flex;
             width: 100%;
@@ -40,7 +40,7 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        /* Barra Lateral de Cores / Categorias */
+        /* Barra Lateral de Cores */
         .barra-cores {
             display: flex;
             flex-direction: column;
@@ -55,7 +55,6 @@
             min-height: 25px;
         }
 
-        /* Cores */
         .cor-1 { background-color: #d32f2f; }
         .cor-2 { background-color: #f57c00; }
         .cor-3 { background-color: #fbc02d; }
@@ -70,7 +69,7 @@
         .cor-12 { background-color: #757575; }
         .cor-13 { background-color: #5d4037; }
 
-        /* Área de Conteúdo */
+        /* Área do Conteúdo Principal */
         .area-conteudo {
             flex: 1;
             display: flex;
@@ -82,7 +81,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            padding: 8px;
+            padding: 10px;
             background-color: #f0f4f8;
             border-radius: 8px;
             align-items: center;
@@ -90,13 +89,12 @@
 
         .label-nivel {
             width: 100%;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: bold;
-            color: #666;
+            color: #555;
             margin-bottom: 2px;
         }
 
-        /* Botões de Opção */
         .btn-opcao {
             padding: 10px 14px;
             font-size: 15px;
@@ -113,8 +111,8 @@
             background-color: #ffebee;
         }
 
-        /* Seção de Macros Personalizados */
-        .secao-macros {
+        /* Seção de Configuração do Macro com 5 Caixas */
+        .secao-macro-config {
             width: 100%;
             max-width: 650px;
             background: #fff;
@@ -123,74 +121,61 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
 
-        .form-macro {
+        .input-categoria-nome {
+            padding: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            border: 2px solid #7b1fa2;
+            border-radius: 6px;
+            outline: none;
+            width: 100%;
+            color: #4a148c;
+        }
+
+        .grid-5-caixas {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .caixa-frase-item {
             display: flex;
             gap: 8px;
-            flex-wrap: wrap;
+            align-items: center;
         }
 
-        .form-macro input {
-            padding: 10px;
+        .caixa-frase-item span {
+            font-weight: bold;
             font-size: 14px;
-            border: 2px solid #ccc;
+            color: #666;
+            width: 20px;
+        }
+
+        .caixa-frase-item input {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid #ccc;
             border-radius: 6px;
             outline: none;
         }
 
-        .input-rotulo { flex: 1; min-width: 120px; }
-        .input-frase { flex: 2; min-width: 180px; }
-
-        .btn-add-macro {
-            padding: 10px 15px;
-            font-size: 14px;
+        .btn-salvar-macro {
+            padding: 12px;
+            font-size: 15px;
             font-weight: bold;
             background-color: #2e7d32;
             color: white;
             border: none;
             border-radius: 6px;
             cursor: pointer;
-        }
-
-        .grid-macros {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
             margin-top: 5px;
         }
 
-        .card-macro {
-            display: flex;
-            align-items: center;
-            background-color: #e1f5fe;
-            border: 2px solid #0288d1;
-            border-radius: 6px;
-            overflow: hidden;
-        }
-
-        .btn-macro-falar {
-            padding: 8px 12px;
-            background: none;
-            border: none;
-            font-size: 14px;
-            font-weight: bold;
-            color: #01579b;
-            cursor: pointer;
-        }
-
-        .btn-macro-remover {
-            padding: 8px 8px;
-            background-color: #e53935;
-            color: white;
-            border: none;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        /* Ações Rápidas do Rodapé */
+        /* Rodapé Fixo */
         .acoes-rodape {
             display: flex;
             flex-wrap: wrap;
@@ -219,7 +204,6 @@
         .btn-escrever { background-color: #0277bd; }
         .btn-falar { background-color: #6a1b9a; flex: 1.5; }
 
-        /* Caixa de Texto Digitado */
         .caixa-escrita {
             display: flex;
             gap: 10px;
@@ -250,7 +234,7 @@
 </head>
 <body>
 
-    <h1>Prancha de Comunicação CAA + Macros</h1>
+    <h1>Prancha de Comunicação CAA + Macros Categorizados</h1>
 
     <div class="container-app">
         <!-- Barra de Cores Lateral -->
@@ -270,54 +254,59 @@
             <div class="bloco-cor cor-13"></div>
         </div>
 
-        <!-- Área dos Níveis Dinâmicos -->
         <div class="area-conteudo">
             
-            <!-- Nível 1 -->
+            <!-- Nível 1 - Categorias Padrão e Macros -->
             <div class="linha-nivel">
-                <span class="label-nivel">Nível 1 - Categoria</span>
+                <span class="label-nivel">Nível 1 - Categorias</span>
                 <button class="btn-opcao" onclick="selecionarNivel1('Comida')">Comida</button>
                 <button class="btn-opcao" onclick="selecionarNivel1('Dor')">Dor</button>
                 <button class="btn-opcao" onclick="selecionarNivel1('Banheiro')">Banheiro</button>
                 <button class="btn-opcao" onclick="selecionarNivel1('Cumprimento')">Cumprimento</button>
                 <button class="btn-opcao" onclick="selecionarNivel1('Resposta')">Resposta</button>
+                <!-- Categorias de Macros Personalizadas são inseridas aqui -->
+                <div id="container-macros-nivel1" style="display: inline-flex; gap: 8px; flex-wrap: wrap;"></div>
             </div>
 
-            <!-- Nível 2 -->
+            <!-- Nível 2 - Sub-frases -->
             <div class="linha-nivel" id="nivel2" style="display: none;">
-                <span class="label-nivel">Nível 2 - Opções</span>
-                <div id="conteudo-nivel2"></div>
+                <span class="label-nivel" id="label-nivel2">Nível 2 - Opções</span>
+                <div id="conteudo-nivel2" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
             </div>
 
             <!-- Nível 3 -->
             <div class="linha-nivel" id="nivel3" style="display: none;">
                 <span class="label-nivel">Nível 3 - Tipo</span>
-                <div id="conteudo-nivel3"></div>
+                <div id="conteudo-nivel3" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
             </div>
 
             <!-- Nível 4 -->
             <div class="linha-nivel" id="nivel4" style="display: none;">
                 <span class="label-nivel">Nível 4 - Variedade</span>
-                <div id="conteudo-nivel4"></div>
+                <div id="conteudo-nivel4" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
             </div>
 
         </div>
     </div>
 
-    <!-- Seção de Criar Macros Personalizados -->
-    <div class="secao-macros">
-        <span class="label-nivel" style="font-size: 14px;">Meus Macros / Botões Personalizados</span>
-        <div class="form-macro">
-            <input type="text" id="macroNome" class="input-rotulo" placeholder="Nome do botão (ex: Remédio)">
-            <input type="text" id="macroTexto" class="input-frase" placeholder="Frase completa que vai falar (ex: Por favor, me dê o meu remédio)">
-            <button class="btn-add-macro" onclick="adicionarMacro()">+ Adicionar Macro</button>
+    <!-- Seção de Cadastro de Macro com 5 Caixas -->
+    <div class="secao-macro-config">
+        <span class="label-nivel" style="font-size: 14px; color: #4a148c;">Criar/Editar Macro (Ex: "Mãe")</span>
+        <input type="text" id="nomeMacroGrupo" class="input-categoria-nome" placeholder="Nome do Macro (ex: Mãe, Remédios, Ajudante)">
+
+        <span class="label-nivel">Digite até 5 falas para esse Macro:</span>
+        <div class="grid-5-caixas">
+            <div class="caixa-frase-item"><span>1.</span><input type="text" id="frase1" placeholder="Fala 1 (ex: Mãe, vem cá)"></div>
+            <div class="caixa-frase-item"><span>2.</span><input type="text" id="frase2" placeholder="Fala 2 (ex: Mãe, estou com fome)"></div>
+            <div class="caixa-frase-item"><span>3.</span><input type="text" id="frase3" placeholder="Fala 3 (ex: Mãe, me ajuda aqui)"></div>
+            <div class="caixa-frase-item"><span>4.</span><input type="text" id="frase4" placeholder="Fala 4 (ex: Mãe, me dá água)"></div>
+            <div class="caixa-frase-item"><span>5.</span><input type="text" id="frase5" placeholder="Fala 5 (ex: Te amo, mãe)"></div>
         </div>
-        <div id="gridMacros" class="grid-macros">
-            <!-- Macros salvos vão aparecer aqui -->
-        </div>
+
+        <button class="btn-salvar-macro" onclick="salvarMacroGrupo()">Salvar Macro</button>
     </div>
 
-    <!-- Botões Inferiores Fixos -->
+    <!-- Botões Fixos de Ação -->
     <div class="acoes-rodape">
         <button class="btn-rodape btn-sim" onclick="falar('SIM')">SIM</button>
         <button class="btn-rodape btn-nao" onclick="falar('NÃO')">NÃO</button>
@@ -325,9 +314,9 @@
         <button class="btn-rodape btn-falar" onclick="falar('Quero falar com você')">Quero falar com você</button>
     </div>
 
-    <!-- Entrada de Texto Instantânea -->
+    <!-- Caixa para Digitar e Falar Momentâneo -->
     <div class="caixa-escrita">
-        <input type="text" id="campoTexto" class="campo-escrita" placeholder="Digite uma mensagem momentânea..." onkeydown="checarEnter(event)">
+        <input type="text" id="campoTexto" class="campo-escrita" placeholder="Digite para falar algo momentâneo..." onkeydown="checarEnter(event)">
         <button class="btn-enviar" onclick="enviarTexto()">Falar</button>
     </div>
 
@@ -342,60 +331,97 @@
             }
         }
 
-        /* Gestão de Macros Personalizados */
-        function carregarMacros() {
-            const macrosSalvos = JSON.parse(localStorage.getItem('caa_macros') || '[]');
-            const grid = document.getElementById('gridMacros');
-            grid.innerHTML = '';
-
-            macrosSalvos.forEach((macro, index) => {
-                const card = document.createElement('div');
-                card.className = 'card-macro';
-                card.innerHTML = `
-                    <button class="btn-macro-falar" onclick="falar('${macro.texto.replace(/'/g, "\\'")}')">${macro.nome}</button>
-                    <button class="btn-macro-remover" onclick="removerMacro(${index})">X</button>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function adicionarMacro() {
-            const inputNome = document.getElementById('macroNome');
-            const inputTexto = document.getElementById('macroTexto');
-
-            const nome = inputNome.value.trim();
-            const texto = inputTexto.value.trim();
-
-            if (nome === '' || texto === '') {
-                alert('Por favor, preencha o nome do botão e a frase que será falada.');
+        /* Salvar Macro com Nome de Categoria e até 5 frases */
+        function salvarMacroGrupo() {
+            const nomeGrupo = document.getElementById('nomeMacroGrupo').value.trim();
+            if (!nomeGrupo) {
+                alert('Por favor, digite o nome do Macro (ex: Mãe).');
                 return;
             }
 
-            const macrosSalvos = JSON.parse(localStorage.getItem('caa_macros') || '[]');
-            macrosSalvos.push({ nome, texto });
-            localStorage.setItem('caa_macros', JSON.stringify(macrosSalvos));
+            const frases = [];
+            for (let i = 1; i <= 5; i++) {
+                const valor = document.getElementById(`frase${i}`).value.trim();
+                if (valor !== '') {
+                    frases.push(valor);
+                }
+            }
 
-            inputNome.value = '';
-            inputTexto.value = '';
-            carregarMacros();
+            if (frases.length === 0) {
+                alert('Preencha pelo menos uma fala para o macro.');
+                return;
+            }
+
+            const grupos = JSON.parse(localStorage.getItem('caa_macro_grupos') || '{}');
+            grupos[nomeGrupo] = frases;
+            localStorage.setItem('caa_macro_grupos', JSON.stringify(grupos));
+
+            // Limpa formulário
+            document.getElementById('nomeMacroGrupo').value = '';
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`frase${i}`).value = '';
+            }
+
+            carregarMacrosTela();
         }
 
-        function removerMacro(index) {
-            const macrosSalvos = JSON.parse(localStorage.getItem('caa_macros') || '[]');
-            macrosSalvos.splice(index, 1);
-            localStorage.setItem('caa_macros', JSON.stringify(macrosSalvos));
-            carregarMacros();
+        /* Renderizar Macros Criados no Nível 1 */
+        function carregarMacrosTela() {
+            const container = document.getElementById('container-macros-nivel1');
+            container.innerHTML = '';
+
+            const grupos = JSON.parse(localStorage.getItem('caa_macro_grupos') || '{}');
+
+            for (const nomeGrupo in grupos) {
+                const btn = document.createElement('button');
+                btn.className = 'btn-opcao';
+                btn.style.borderColor = '#7b1fa2';
+                btn.style.color = '#7b1fa2';
+                btn.textContent = nomeGrupo;
+                btn.onclick = () => abrirMacroGrupo(nomeGrupo, grupos[nomeGrupo]);
+                container.appendChild(btn);
+            }
         }
 
-        /* Navegação em Níveis */
+        /* Abrir o Nível 2 com as 5 caixas/falas do Macro selecionado */
+        function abrirMacroGrupo(nomeGrupo, frases) {
+            falar(nomeGrupo);
+
+            const n2 = document.getElementById('nivel2');
+            const c2 = document.getElementById('conteudo-nivel2');
+            const labelN2 = document.getElementById('label-nivel2');
+
+            document.getElementById('nivel3').style.display = 'none';
+            document.getElementById('nivel4').style.display = 'none';
+
+            labelN2.textContent = `Opções de "${nomeGrupo}"`;
+            c2.innerHTML = '';
+
+            frases.forEach(frase => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-opcao';
+                btn.style.borderColor = '#4a148c';
+                btn.style.color = '#4a148c';
+                btn.textContent = frase;
+                btn.onclick = () => falar(frase);
+                c2.appendChild(btn);
+            });
+
+            n2.style.display = 'flex';
+        }
+
+        /* Seleção Padrão das Categorias do Sistema */
         function selecionarNivel1(opcao) {
             falar(opcao);
             
             const n2 = document.getElementById('nivel2');
             const c2 = document.getElementById('conteudo-nivel2');
+            const labelN2 = document.getElementById('label-nivel2');
+
             document.getElementById('nivel3').style.display = 'none';
             document.getElementById('nivel4').style.display = 'none';
 
+            labelN2.textContent = 'Nível 2 - Opções';
             c2.innerHTML = '';
 
             if (opcao === 'Comida') {
@@ -468,8 +494,8 @@
             }
         }
 
-        // Inicializa os macros do LocalStorage ao carregar
-        carregarMacros();
+        // Inicializa ao carregar a página
+        carregarMacrosTela();
     </script>
 </body>
 </html>
