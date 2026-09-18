@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App de Comunicação</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+            gap: 15px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .btn-principal {
+            width: 100%;
+            max-width: 300px;
+            padding: 20px;
+            font-size: 22px;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            color: white;
+            transition: transform 0.1s;
+        }
+
+        .btn-principal:active {
+            transform: scale(0.98);
+        }
+
+        .btn-sim { background-color: #2e7d32; }
+        .btn-nao { background-color: #c62828; }
+        .btn-escrever { background-color: #0277bd; }
+        .btn-falar { background-color: #7b1fa2; }
+
+        .caixa-escrita {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 300px;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        input[type="text"] {
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .btn-enviar {
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            background-color: #f57c00;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <button class="btn-principal btn-sim" onclick="falar('Sim')">SIM</button>
+    <button class="btn-principal btn-nao" onclick="falar('Não')">NÃO</button>
+    <button class="btn-principal btn-escrever" onclick="falar('Estou escrevendo')">Escrever</button>
+    <button class="btn-principal btn-falar" onclick="falar('Quero falar com você')">Quero falar com você</button>
+
+    <div class="caixa-escrita">
+        <input type="text" id="campoTexto" placeholder="Digite aqui...">
+        <button class="btn-enviar" onclick="enviarTexto()">Enviar</button>
+    </div>
+
+    <script>
+        function falar(mensagem) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+
+                const utterance = new SpeechSynthesisUtterance(mensagem);
+                utterance.lang = 'pt-BR';
+                utterance.rate = 1.0;
+
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert('A síntese de voz não é suportada neste navegador.');
+            }
+        }
+
+        function enviarTexto() {
+            const campo = document.getElementById('campoTexto');
+            const texto = campo.value.trim();
+
+            if (texto !== "") {
+                falar(texto);
+                campo.value = ""; 
+            }
+        }
+    </script>
+
+</body>
+</html>
