@@ -1,501 +1,748 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="h-full bg-slate-950">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App de Comunicação CAA + Macros por Categoria</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Prancha CAA - Mobile</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        mobileBg: '#0f172a',
+                        caa: {
+                            person: '#fef08a',  // Yellow
+                            verb: '#bbf7d0',    // Green
+                            noun: '#fed7aa',    // Orange
+                            adj: '#bfdbfe',     // Blue
+                            social: '#fbcfe8',  // Pink
+                            quest: '#e9d5ff',   // Purple
+                            emotion: '#fecaca'  // Red
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        /* Mobile touch and app experience optimizations */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
+            overscroll-behavior-y: none;
+            -webkit-user-select: none;
+            user-select: none;
+            touch-action: manipulation;
+        }
+
+        /* Active Feedback for Touch Buttons */
+        .touch-btn {
+            transition: transform 0.08s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s ease, box-shadow 0.15s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .touch-btn:active {
+            transform: scale(0.93) translateY(1px);
+        }
+
+        /* Custom Mobile Scrollbars */
+        .mobile-scroll::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        .mobile-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .mobile-scroll::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.3);
+            border-radius: 99px;
+        }
+
+        /* Screen Transitions */
+        .tab-page {
+            display: none;
+        }
+        .tab-page.active {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 15px;
-            gap: 15px;
         }
 
-        h1 {
-            font-size: 20px;
-            color: #333;
-            text-align: center;
+        /* Safe Area Padding for modern smartphones (iPhone Notch / Gestures) */
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom, 12px);
         }
-
-        /* Container Principal */
-        .container-app {
-            display: flex;
-            width: 100%;
-            max-width: 650px;
-            gap: 15px;
-            background: #fff;
-            padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        /* Barra Lateral de Cores */
-        .barra-cores {
-            display: flex;
-            flex-direction: column;
-            width: 35px;
-            border: 2px solid #000;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .bloco-cor {
-            flex: 1;
-            min-height: 25px;
-        }
-
-        .cor-1 { background-color: #d32f2f; }
-        .cor-2 { background-color: #f57c00; }
-        .cor-3 { background-color: #fbc02d; }
-        .cor-4 { background-color: #afb42b; }
-        .cor-5 { background-color: #7cb342; }
-        .cor-6 { background-color: #388e3c; }
-        .cor-7 { background-color: #00acc1; }
-        .cor-8 { background-color: #0288d1; }
-        .cor-9 { background-color: #7b1fa2; }
-        .cor-10 { background-color: #f06292; }
-        .cor-11 { background-color: #b39ddb; }
-        .cor-12 { background-color: #757575; }
-        .cor-13 { background-color: #5d4037; }
-
-        /* Área do Conteúdo Principal */
-        .area-conteudo {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .linha-nivel {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            padding: 10px;
-            background-color: #f0f4f8;
-            border-radius: 8px;
-            align-items: center;
-        }
-
-        .label-nivel {
-            width: 100%;
-            font-size: 13px;
-            font-weight: bold;
-            color: #555;
-            margin-bottom: 2px;
-        }
-
-        .btn-opcao {
-            padding: 10px 14px;
-            font-size: 15px;
-            font-weight: bold;
-            color: #c62828;
-            background-color: #ffffff;
-            border: 2px solid #c62828;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-opcao:hover {
-            background-color: #ffebee;
-        }
-
-        /* Seção de Configuração do Macro com 5 Caixas */
-        .secao-macro-config {
-            width: 100%;
-            max-width: 650px;
-            background: #fff;
-            padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .input-categoria-nome {
-            padding: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            border: 2px solid #7b1fa2;
-            border-radius: 6px;
-            outline: none;
-            width: 100%;
-            color: #4a148c;
-        }
-
-        .grid-5-caixas {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .caixa-frase-item {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .caixa-frase-item span {
-            font-weight: bold;
-            font-size: 14px;
-            color: #666;
-            width: 20px;
-        }
-
-        .caixa-frase-item input {
-            flex: 1;
-            padding: 8px 12px;
-            font-size: 14px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            outline: none;
-        }
-
-        .btn-salvar-macro {
-            padding: 12px;
-            font-size: 15px;
-            font-weight: bold;
-            background-color: #2e7d32;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 5px;
-        }
-
-        /* Rodapé Fixo */
-        .acoes-rodape {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            width: 100%;
-            max-width: 650px;
-            justify-content: space-between;
-        }
-
-        .btn-rodape {
-            padding: 15px 10px;
-            font-size: 16px;
-            font-weight: bold;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            flex: 1;
-            min-width: 80px;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        .btn-sim { background-color: #2e7d32; }
-        .btn-nao { background-color: #c62828; }
-        .btn-escrever { background-color: #0277bd; }
-        .btn-falar { background-color: #6a1b9a; flex: 1.5; }
-
-        .caixa-escrita {
-            display: flex;
-            gap: 10px;
-            width: 100%;
-            max-width: 650px;
-        }
-
-        input[type="text"].campo-escrita {
-            flex: 1;
-            padding: 12px;
-            font-size: 16px;
-            border: 2px solid #ccc;
-            border-radius: 8px;
-            outline: none;
-        }
-
-        .btn-enviar {
-            padding: 12px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            background-color: #f57c00;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
+        .pt-safe {
+            padding-top: env(safe-area-inset-top, 8px);
         }
     </style>
 </head>
-<body>
+<body class="h-full w-full flex items-center justify-center p-0 sm:p-3 bg-slate-950 font-sans antialiased text-slate-800">
 
-    <h1>Prancha de Comunicação CAA + Macros Categorizados</h1>
+    <!-- Smartphone Frame Container -->
+    <div class="w-full h-full max-w-md bg-slate-100 sm:rounded-[36px] sm:shadow-2xl sm:border-8 sm:border-slate-800 flex flex-col overflow-hidden relative border-0">
 
-    <div class="container-app">
-        <!-- Barra de Cores Lateral -->
-        <div class="barra-cores">
-            <div class="bloco-cor cor-1"></div>
-            <div class="bloco-cor cor-2"></div>
-            <div class="bloco-cor cor-3"></div>
-            <div class="bloco-cor cor-4"></div>
-            <div class="bloco-cor cor-5"></div>
-            <div class="bloco-cor cor-6"></div>
-            <div class="bloco-cor cor-7"></div>
-            <div class="bloco-cor cor-8"></div>
-            <div class="bloco-cor cor-9"></div>
-            <div class="bloco-cor cor-10"></div>
-            <div class="bloco-cor cor-11"></div>
-            <div class="bloco-cor cor-12"></div>
-            <div class="bloco-cor cor-13"></div>
-        </div>
-
-        <div class="area-conteudo">
+        <!-- Mobile Header (App Status & Speech Banner) -->
+        <header class="bg-slate-900 text-white pt-safe px-3.5 py-2.5 flex flex-col gap-2 flex-shrink-0 shadow-md">
             
-            <!-- Nível 1 - Categorias Padrão e Macros -->
-            <div class="linha-nivel">
-                <span class="label-nivel">Nível 1 - Categorias</span>
-                <button class="btn-opcao" onclick="selecionarNivel1('Comida')">Comida</button>
-                <button class="btn-opcao" onclick="selecionarNivel1('Dor')">Dor</button>
-                <button class="btn-opcao" onclick="selecionarNivel1('Banheiro')">Banheiro</button>
-                <button class="btn-opcao" onclick="selecionarNivel1('Cumprimento')">Cumprimento</button>
-                <button class="btn-opcao" onclick="selecionarNivel1('Resposta')">Resposta</button>
-                <!-- Categorias de Macros Personalizadas são inseridas aqui -->
-                <div id="container-macros-nivel1" style="display: inline-flex; gap: 8px; flex-wrap: wrap;"></div>
+            <div class="flex items-center justify-between">
+                <!-- App Title -->
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center font-black text-sm shadow-sm">
+                        <i class="fa-solid fa-hands-asl-interpreting"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold text-sm leading-tight tracking-tight">CAA Mobile</h1>
+                        <p class="text-[10px] text-purple-300 font-medium">Voz & Comunicação</p>
+                    </div>
+                </div>
+
+                <!-- Live Talking Pill -->
+                <div id="speechIndicator" class="hidden flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/20 text-emerald-400 text-[10px] font-bold rounded-full border border-emerald-500/40">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    <span>Falando...</span>
+                </div>
             </div>
 
-            <!-- Nível 2 - Sub-frases -->
-            <div class="linha-nivel" id="nivel2" style="display: none;">
-                <span class="label-nivel" id="label-nivel2">Nível 2 - Opções</span>
-                <div id="conteudo-nivel2" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+            <!-- Last Spoken Output Bar -->
+            <div class="bg-slate-800/90 border border-slate-700/80 rounded-xl px-3 py-2 flex items-center gap-2.5 shadow-inner">
+                <i class="fa-solid fa-volume-high text-purple-400 text-sm flex-shrink-0"></i>
+                <div class="flex-1 overflow-hidden">
+                    <span class="text-[9px] uppercase font-extrabold text-slate-400 tracking-wider block">Última Fala:</span>
+                    <p id="textoUltimaFala" class="font-bold text-white text-xs sm:text-sm truncate">Toque nos botões para falar...</p>
+                </div>
+                <button onclick="repetirUltimaFala()" title="Repetir fala" class="p-1.5 text-slate-300 hover:text-white active:bg-slate-700 rounded-lg transition-colors flex-shrink-0">
+                    <i class="fa-solid fa-rotate-right text-sm"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col min-h-0 overflow-hidden relative bg-slate-100">
+
+            <!-- TAB 1: PRANCHA CAA (MAIN BOARD) -->
+            <div id="tabPrancha" class="tab-page active flex-1 flex flex-col p-2.5 gap-2 min-h-0 overflow-hidden">
+
+                <!-- Color Key Category Strip for Mobile -->
+                <div class="flex h-1.5 w-full rounded-full overflow-hidden flex-shrink-0 shadow-xs">
+                    <div class="w-1/7 bg-yellow-400" title="Pessoas"></div>
+                    <div class="w-1/7 bg-emerald-400" title="Verbos"></div>
+                    <div class="w-1/7 bg-orange-400" title="Objetos"></div>
+                    <div class="w-1/7 bg-sky-400" title="Adjetivos"></div>
+                    <div class="w-1/7 bg-pink-400" title="Social"></div>
+                    <div class="w-1/7 bg-purple-400" title="Perguntas"></div>
+                    <div class="w-1/7 bg-red-400" title="Emoções"></div>
+                </div>
+
+                <!-- Scrollable Cards Box -->
+                <div class="flex-1 flex flex-col gap-2.5 overflow-y-auto mobile-scroll pr-0.5">
+
+                    <!-- LEVEL 1: Main Categories & Custom User Macros -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-2.5 shadow-sm relative flex flex-col">
+                        <div class="flex items-center justify-between mb-2 pb-1.5 border-b border-slate-100">
+                            <span class="text-[11px] font-extrabold uppercase tracking-wider text-purple-700 flex items-center gap-1">
+                                <i class="fa-solid fa-layer-group"></i> Nível 1 - Categorias
+                            </span>
+                            <span class="text-[10px] font-semibold text-slate-400">Toque para abrir</span>
+                        </div>
+
+                        <!-- Grid of Main Buttons -->
+                        <div class="grid grid-cols-2 gap-2 pb-11">
+                            <!-- Default Categories -->
+                            <button onclick="selecionarNivel1('Comida')" class="touch-btn flex items-center gap-2 bg-amber-100 hover:bg-amber-200 text-amber-950 border border-amber-300/80 rounded-xl p-2.5 font-bold text-xs shadow-xs">
+                                <i class="fa-solid fa-utensils text-amber-600 text-sm"></i> Comida
+                            </button>
+                            <button onclick="selecionarNivel1('Dor')" class="touch-btn flex items-center gap-2 bg-rose-100 hover:bg-rose-200 text-rose-950 border border-rose-300/80 rounded-xl p-2.5 font-bold text-xs shadow-xs">
+                                <i class="fa-solid fa-notes-medical text-rose-600 text-sm"></i> Dor / Corpo
+                            </button>
+                            <button onclick="selecionarNivel1('Banheiro')" class="touch-btn flex items-center gap-2 bg-cyan-100 hover:bg-cyan-200 text-cyan-950 border border-cyan-300/80 rounded-xl p-2.5 font-bold text-xs shadow-xs">
+                                <i class="fa-solid fa-restroom text-cyan-600 text-sm"></i> Banheiro
+                            </button>
+                            <button onclick="selecionarNivel1('Cumprimento')" class="touch-btn flex items-center gap-2 bg-pink-100 hover:bg-pink-200 text-pink-950 border border-pink-300/80 rounded-xl p-2.5 font-bold text-xs shadow-xs">
+                                <i class="fa-solid fa-comments text-pink-600 text-sm"></i> Cumprimento
+                            </button>
+                            <button onclick="selecionarNivel1('Resposta')" class="touch-btn flex items-center gap-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-950 border border-indigo-300/80 rounded-xl p-2.5 font-bold text-xs shadow-xs">
+                                <i class="fa-solid fa-reply text-indigo-600 text-sm"></i> Resposta
+                            </button>
+
+                            <!-- Custom User Macros Container -->
+                            <div id="containerMacrosNivel1" class="contents"></div>
+                        </div>
+
+                        <!-- Delete Button positioned at bottom right corner near macros -->
+                        <div class="absolute bottom-2 right-2">
+                            <button onclick="abrirModalExcluirMacros()" 
+                                    class="touch-btn flex items-center gap-1 bg-red-600 active:bg-red-700 text-white font-extrabold text-[11px] px-3 py-1.5 rounded-lg shadow-md shadow-red-200 border border-red-500">
+                                <i class="fa-solid fa-trash-can text-xs"></i>
+                                <span>Excluir</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- LEVEL 2: Sub Options / Dynamic Phrases -->
+                    <div id="painelNivel2" class="hidden bg-purple-50/80 border-2 border-purple-200 rounded-2xl p-2.5 shadow-sm transition-all">
+                        <div class="flex items-center justify-between mb-2 pb-1.5 border-b border-purple-200">
+                            <span id="labelNivel2" class="text-[11px] font-extrabold uppercase tracking-wider text-purple-900 flex items-center gap-1">
+                                <i class="fa-solid fa-list-ul"></i> Nível 2
+                            </span>
+                            <button onclick="fecharAteNivel(1)" class="text-purple-400 hover:text-purple-700 p-1">
+                                <i class="fa-solid fa-xmark font-bold text-xs"></i>
+                            </button>
+                        </div>
+                        <div id="conteudoNivel2" class="flex flex-wrap gap-1.5"></div>
+                    </div>
+
+                    <!-- LEVEL 3: Detail / Variety -->
+                    <div id="painelNivel3" class="hidden bg-indigo-50/80 border-2 border-indigo-200 rounded-2xl p-2.5 shadow-sm transition-all">
+                        <div class="flex items-center justify-between mb-2 pb-1.5 border-b border-indigo-200">
+                            <span id="labelNivel3" class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-900 flex items-center gap-1">
+                                <i class="fa-solid fa-tags"></i> Nível 3
+                            </span>
+                            <button onclick="fecharAteNivel(2)" class="text-indigo-400 hover:text-indigo-700 p-1">
+                                <i class="fa-solid fa-xmark font-bold text-xs"></i>
+                            </button>
+                        </div>
+                        <div id="conteudoNivel3" class="flex flex-wrap gap-1.5"></div>
+                    </div>
+
+                    <!-- LEVEL 4: Specific Options -->
+                    <div id="painelNivel4" class="hidden bg-sky-50/80 border-2 border-sky-200 rounded-2xl p-2.5 shadow-sm transition-all">
+                        <div class="flex items-center justify-between mb-2 pb-1.5 border-b border-sky-200">
+                            <span id="labelNivel4" class="text-[11px] font-extrabold uppercase tracking-wider text-sky-900 flex items-center gap-1">
+                                <i class="fa-solid fa-sliders"></i> Nível 4
+                            </span>
+                            <button onclick="fecharAteNivel(3)" class="text-sky-400 hover:text-sky-700 p-1">
+                                <i class="fa-solid fa-xmark font-bold text-xs"></i>
+                            </button>
+                        </div>
+                        <div id="conteudoNivel4" class="flex flex-wrap gap-1.5"></div>
+                    </div>
+
+                </div>
             </div>
 
-            <!-- Nível 3 -->
-            <div class="linha-nivel" id="nivel3" style="display: none;">
-                <span class="label-nivel">Nível 3 - Tipo</span>
-                <div id="conteudo-nivel3" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+            <!-- TAB 2: MINHAS MACROS (FORMULÁRIO DE CRIAÇÃO) -->
+            <div id="tabMacros" class="tab-page flex-1 flex-col p-3 gap-3 min-h-0 overflow-y-auto mobile-scroll">
+                <div class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-sm space-y-3">
+                    <div class="flex items-center gap-2 border-b border-slate-100 pb-2">
+                        <div class="w-7 h-7 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center text-xs font-bold">
+                            <i class="fa-solid fa-plus"></i>
+                        </div>
+                        <div>
+                            <h2 class="font-extrabold text-sm text-slate-800">Criar Nova Macro</h2>
+                            <p class="text-[10px] text-slate-400">Gera um botão personalizado no Nível 1</p>
+                        </div>
+                    </div>
+
+                    <form onsubmit="salvarMacroForm(event)" class="space-y-2.5">
+                        <div>
+                            <label for="nomeMacroGrupo" class="block text-xs font-bold text-slate-700 mb-1">
+                                Nome da Categoria / Botão <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" id="nomeMacroGrupo" required placeholder="Ex: Mãe, Cuidados, Remédios..."
+                                   class="w-full px-3 py-2 text-xs font-semibold border-2 border-slate-200 rounded-xl focus:border-purple-600 focus:outline-none transition-colors">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">
+                                Frases/Falantes (até 5 opções):
+                            </label>
+                            <div class="space-y-1.5">
+                                <input type="text" id="frase1" placeholder="1. Vem cá por favor" class="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:border-purple-500 focus:outline-none">
+                                <input type="text" id="frase2" placeholder="2. Preciso de ajuda" class="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:border-purple-500 focus:outline-none">
+                                <input type="text" id="frase3" placeholder="3. Quero deitar" class="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:border-purple-500 focus:outline-none">
+                                <input type="text" id="frase4" placeholder="4. Me dá o celular" class="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:border-purple-500 focus:outline-none">
+                                <input type="text" id="frase5" placeholder="5. Te amo" class="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:border-purple-500 focus:outline-none">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="touch-btn w-full bg-emerald-600 active:bg-emerald-700 text-white font-extrabold text-xs py-2.5 rounded-xl shadow-sm flex items-center justify-center gap-2 mt-2">
+                            <i class="fa-solid fa-floppy-disk"></i> Salvar Macro no Celular
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Management Card -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-3 shadow-sm flex items-center justify-between">
+                    <div>
+                        <h3 class="font-bold text-xs text-slate-800">Gerenciar Macros Existentes</h3>
+                        <p class="text-[10px] text-slate-400">Exclua ou revise itens salvos</p>
+                    </div>
+                    <button onclick="abrirModalExcluirMacros()" class="touch-btn bg-red-100 text-red-700 hover:bg-red-200 font-bold text-xs px-3 py-1.5 rounded-lg border border-red-200">
+                        <i class="fa-solid fa-trash-can"></i> Gerenciar
+                    </button>
+                </div>
             </div>
 
-            <!-- Nível 4 -->
-            <div class="linha-nivel" id="nivel4" style="display: none;">
-                <span class="label-nivel">Nível 4 - Variedade</span>
-                <div id="conteudo-nivel4" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+            <!-- TAB 3: DIGITAÇÃO LIVRE / TECLADO MOBILE -->
+            <div id="tabTeclado" class="tab-page flex-1 flex-col p-3 gap-3 min-h-0 overflow-y-auto mobile-scroll">
+                <div class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-sm space-y-3 flex-1 flex flex-col">
+                    <div class="flex items-center gap-2 border-b border-slate-100 pb-2">
+                        <div class="w-7 h-7 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center text-xs font-bold">
+                            <i class="fa-solid fa-keyboard"></i>
+                        </div>
+                        <div>
+                            <h2 class="font-extrabold text-sm text-slate-800">Escrever Frase Livre</h2>
+                            <p class="text-[10px] text-slate-400">Use o teclado do seu smartphone</p>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 flex flex-col gap-2">
+                        <textarea id="campoTextoMobile" rows="4" placeholder="Digite aqui o que você quer falar..." 
+                                  class="w-full p-3 text-sm font-semibold border-2 border-slate-200 rounded-xl focus:border-purple-600 focus:outline-none transition-colors resize-none flex-1"></textarea>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="limparTextoMobile()" class="touch-btn bg-slate-200 text-slate-700 font-bold text-xs py-2.5 rounded-xl flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-eraser"></i> Limpar
+                            </button>
+                            <button onclick="enviarTextoMobile()" class="touch-btn bg-amber-500 active:bg-amber-600 text-white font-extrabold text-xs py-2.5 rounded-xl shadow-sm flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-paper-plane"></i> Falar Frase
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
+        </main>
+
+        <!-- QUICK EXPRESS BUTTONS BAR (FIXED ABOVE TAB BAR) -->
+        <div class="bg-slate-200/90 backdrop-blur-xs p-1.5 border-t border-slate-300 flex-shrink-0">
+            <div class="grid grid-cols-4 gap-1.5">
+                <button onclick="falar('SIM')" class="touch-btn bg-emerald-600 text-white font-black text-xs py-2 rounded-xl shadow-xs flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-check text-sm"></i> SIM
+                </button>
+                <button onclick="falar('NÃO')" class="touch-btn bg-rose-600 text-white font-black text-xs py-2 rounded-xl shadow-xs flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-xmark text-sm"></i> NÃO
+                </button>
+                <button onclick="falar('Preciso de ajuda')" class="touch-btn bg-amber-600 text-white font-black text-[11px] py-2 rounded-xl shadow-xs flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-hand text-xs"></i> Ajuda
+                </button>
+                <!-- Botão 'Estou digitando' inserido perto de Ajuda -->
+                <button onclick="falarEstouDigitando()" class="touch-btn bg-indigo-600 text-white font-black text-[10px] leading-tight py-2 rounded-xl shadow-xs flex flex-col items-center justify-center gap-0.5">
+                    <div class="flex items-center gap-1">
+                        <i class="fa-solid fa-keyboard text-xs"></i>
+                        <span class="font-bold">Digitando...</span>
+                    </div>
+                </button>
+            </div>
         </div>
+
+        <!-- BOTTOM MOBILE NAVIGATION TAB BAR -->
+        <nav class="bg-slate-900 text-slate-400 pb-safe pt-2 px-2 border-t border-slate-800 flex justify-around flex-shrink-0">
+            <button onclick="mudarAba('tabPrancha')" id="nav-tabPrancha" class="touch-btn flex flex-col items-center gap-0.5 px-3 py-1 text-purple-400 font-bold">
+                <i class="fa-solid fa-grip text-base"></i>
+                <span class="text-[10px]">Prancha</span>
+            </button>
+            <button onclick="mudarAba('tabMacros')" id="nav-tabMacros" class="touch-btn flex flex-col items-center gap-0.5 px-3 py-1 hover:text-slate-200 font-bold">
+                <i class="fa-solid fa-plus-circle text-base"></i>
+                <span class="text-[10px]">Criar Macro</span>
+            </button>
+            <button onclick="mudarAba('tabTeclado')" id="nav-tabTeclado" class="touch-btn flex flex-col items-center gap-0.5 px-3 py-1 hover:text-slate-200 font-bold">
+                <i class="fa-solid fa-font text-base"></i>
+                <span class="text-[10px]">Digitar</span>
+            </button>
+        </nav>
+
     </div>
 
-    <!-- Seção de Cadastro de Macro com 5 Caixas -->
-    <div class="secao-macro-config">
-        <span class="label-nivel" style="font-size: 14px; color: #4a148c;">Criar/Editar Macro (Ex: "Mãe")</span>
-        <input type="text" id="nomeMacroGrupo" class="input-categoria-nome" placeholder="Nome do Macro (ex: Mãe, Remédios, Ajudante)">
+    <!-- MODAL DE EXCLUSÃO DE MACROS (CELULAR) -->
+    <div id="modalExcluir" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl max-w-md w-full p-4 space-y-3 border border-slate-200 max-h-[85vh] flex flex-col animate-in slide-in-from-bottom duration-200">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2 flex-shrink-0">
+                <div class="flex items-center gap-2 text-red-600">
+                    <i class="fa-solid fa-trash-can text-base"></i>
+                    <h3 class="font-extrabold text-sm text-slate-900">Excluir e Gerenciar Macros</h3>
+                </div>
+                <button onclick="fecharModalExcluir()" class="text-slate-400 p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
 
-        <span class="label-nivel">Digite até 5 falas para esse Macro:</span>
-        <div class="grid-5-caixas">
-            <div class="caixa-frase-item"><span>1.</span><input type="text" id="frase1" placeholder="Fala 1 (ex: Mãe, vem cá)"></div>
-            <div class="caixa-frase-item"><span>2.</span><input type="text" id="frase2" placeholder="Fala 2 (ex: Mãe, estou com fome)"></div>
-            <div class="caixa-frase-item"><span>3.</span><input type="text" id="frase3" placeholder="Fala 3 (ex: Mãe, me ajuda aqui)"></div>
-            <div class="caixa-frase-item"><span>4.</span><input type="text" id="frase4" placeholder="Fala 4 (ex: Mãe, me dá água)"></div>
-            <div class="caixa-frase-item"><span>5.</span><input type="text" id="frase5" placeholder="Fala 5 (ex: Te amo, mãe)"></div>
+            <p class="text-xs text-slate-600 flex-shrink-0">
+                Toque em <b>Apagar</b> ao lado da macro que deseja excluir do seu celular:
+            </p>
+
+            <!-- Scrollable List of Saved Macros -->
+            <div id="listaMacrosModal" class="flex-1 overflow-y-auto mobile-scroll space-y-2 pr-0.5 min-h-[120px]">
+                <!-- Populated via JavaScript -->
+            </div>
+
+            <div class="flex flex-col gap-2 pt-2 border-t border-slate-100 flex-shrink-0">
+                <button onclick="apagarTodosMacros()" class="touch-btn w-full text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 py-2 rounded-xl transition-colors flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-dumpster"></i> Apagar TODAS as Macros do Celular
+                </button>
+                <button onclick="fecharModalExcluir()" class="touch-btn w-full bg-slate-200 active:bg-slate-300 text-slate-800 font-bold text-xs py-2.5 rounded-xl">
+                    Fechar
+                </button>
+            </div>
         </div>
-
-        <button class="btn-salvar-macro" onclick="salvarMacroGrupo()">Salvar Macro</button>
-    </div>
-
-    <!-- Botões Fixos de Ação -->
-    <div class="acoes-rodape">
-        <button class="btn-rodape btn-sim" onclick="falar('SIM')">SIM</button>
-        <button class="btn-rodape btn-nao" onclick="falar('NÃO')">NÃO</button>
-        <button class="btn-rodape btn-escrever" onclick="focarEscrita()">Escrever</button>
-        <button class="btn-rodape btn-falar" onclick="falar('Quero falar com você')">Quero falar com você</button>
-    </div>
-
-    <!-- Caixa para Digitar e Falar Momentâneo -->
-    <div class="caixa-escrita">
-        <input type="text" id="campoTexto" class="campo-escrita" placeholder="Digite para falar algo momentâneo..." onkeydown="checarEnter(event)">
-        <button class="btn-enviar" onclick="enviarTexto()">Falar</button>
     </div>
 
     <script>
+        // Global State Variables
+        let ultimaFraseDita = '';
+        const STORAGE_KEY = 'caa_mobile_macros_v1';
+
+        /* --- SÍNTESE DE VOZ (WEB SPEECH API) --- */
         function falar(texto) {
+            if (!texto) return;
+
+            ultimaFraseDita = texto;
+            const elUltima = document.getElementById('textoUltimaFala');
+            if (elUltima) elUltima.textContent = `"${texto}"`;
+
             if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
+                window.speechSynthesis.cancel(); // Stop current speech
+                
                 const utterance = new SpeechSynthesisUtterance(texto);
                 utterance.lang = 'pt-BR';
-                utterance.rate = 1.0;
+                utterance.rate = 0.92; // Clear rate for mobile speaker
+                utterance.pitch = 1.0;
+
+                const indicator = document.getElementById('speechIndicator');
+                
+                utterance.onstart = () => {
+                    if (indicator) indicator.classList.remove('hidden');
+                };
+
+                utterance.onend = utterance.onerror = () => {
+                    if (indicator) indicator.classList.add('hidden');
+                };
+
                 window.speechSynthesis.speak(utterance);
             }
         }
 
-        /* Salvar Macro com Nome de Categoria e até 5 frases */
-        function salvarMacroGrupo() {
-            const nomeGrupo = document.getElementById('nomeMacroGrupo').value.trim();
+        /* --- AÇÃO DO BOTÃO "ESTOU DIGITANDO" --- */
+        function falarEstouDigitando() {
+            falar('Estou digitando');
+            mudarAba('tabTeclado');
+            setTimeout(() => {
+                const inputArea = document.getElementById('campoTextoMobile');
+                if (inputArea) {
+                    inputArea.focus();
+                }
+            }, 100);
+        }
+
+        function repetirUltimaFala() {
+            if (ultimaFraseDita) {
+                falar(ultimaFraseDita);
+            }
+        }
+
+        /* --- NAVEGAÇÃO DE ABAS MOBILE --- */
+        function mudarAba(abaId) {
+            document.querySelectorAll('.tab-page').forEach(el => el.classList.remove('active'));
+            const alvo = document.getElementById(abaId);
+            if (alvo) alvo.classList.add('active');
+
+            // Reset tab button highlight styles
+            const navTabs = ['nav-tabPrancha', 'nav-tabMacros', 'nav-tabTeclado'];
+            navTabs.forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    btn.classList.remove('text-purple-400');
+                    btn.classList.add('text-slate-400');
+                }
+            });
+
+            const btnAtivo = document.getElementById(`nav-${abaId}`);
+            if (btnAtivo) {
+                btnAtivo.classList.remove('text-slate-400');
+                btnAtivo.classList.add('text-purple-400');
+            }
+        }
+
+        /* --- PERSISTÊNCIA NO LOCALSTORAGE --- */
+        function obterMacrosSalvas() {
+            try {
+                const dados = localStorage.getItem(STORAGE_KEY);
+                return dados ? JSON.parse(dados) : {};
+            } catch (e) {
+                console.error("Erro no LocalStorage:", e);
+                return {};
+            }
+        }
+
+        function salvarMacrosNoStorage(grupos) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(grupos));
+            } catch (e) {
+                console.error("Erro ao gravar LocalStorage:", e);
+            }
+        }
+
+        function salvarMacroForm(event) {
+            event.preventDefault();
+            const nomeInput = document.getElementById('nomeMacroGrupo');
+            const nomeGrupo = nomeInput.value.trim();
+
             if (!nomeGrupo) {
-                alert('Por favor, digite o nome do Macro (ex: Mãe).');
+                alert('Por favor, digite um nome para o botão.');
                 return;
             }
 
             const frases = [];
             for (let i = 1; i <= 5; i++) {
-                const valor = document.getElementById(`frase${i}`).value.trim();
-                if (valor !== '') {
-                    frases.push(valor);
+                const el = document.getElementById(`frase${i}`);
+                if (el && el.value.trim() !== '') {
+                    frases.push(el.value.trim());
                 }
             }
 
             if (frases.length === 0) {
-                alert('Preencha pelo menos uma fala para o macro.');
+                alert('Informe pelo menos 1 frase.');
                 return;
             }
 
-            const grupos = JSON.parse(localStorage.getItem('caa_macro_grupos') || '{}');
+            const grupos = obterMacrosSalvas();
             grupos[nomeGrupo] = frases;
-            localStorage.setItem('caa_macro_grupos', JSON.stringify(grupos));
+            salvarMacrosNoStorage(grupos);
 
-            // Limpa formulário
-            document.getElementById('nomeMacroGrupo').value = '';
+            // Clean Form Inputs
+            nomeInput.value = '';
             for (let i = 1; i <= 5; i++) {
-                document.getElementById(`frase${i}`).value = '';
+                const el = document.getElementById(`frase${i}`);
+                if (el) el.value = '';
             }
 
-            carregarMacrosTela();
+            renderizarMacrosNivel1();
+            falar(`Macro ${nomeGrupo} criada`);
+            mudarAba('tabPrancha');
         }
 
-        /* Renderizar Macros Criados no Nível 1 */
-        function carregarMacrosTela() {
-            const container = document.getElementById('container-macros-nivel1');
+        function deletarMacroIndividual(nomeGrupo) {
+            const grupos = obterMacrosSalvas();
+            if (grupos[nomeGrupo]) {
+                delete grupos[nomeGrupo];
+                salvarMacrosNoStorage(grupos);
+                renderizarMacrosNivel1();
+                atualizarModalExcluir();
+                fecharAteNivel(1);
+            }
+        }
+
+        function apagarTodosMacros() {
+            if (confirm('Tem certeza que deseja apagar TODAS as macros personalizadas deste celular?')) {
+                localStorage.removeItem(STORAGE_KEY);
+                renderizarMacrosNivel1();
+                fecharModalExcluir();
+                fecharAteNivel(1);
+                falar('Macros excluídas');
+            }
+        }
+
+        /* --- RENDERIZAÇÃO DAS MACROS NO NÍVEL 1 --- */
+        function renderizarMacrosNivel1() {
+            const container = document.getElementById('containerMacrosNivel1');
+            if (!container) return;
+
             container.innerHTML = '';
+            const grupos = obterMacrosSalvas();
 
-            const grupos = JSON.parse(localStorage.getItem('caa_macro_grupos') || '{}');
+            Object.keys(grupos).forEach(nomeGrupo => {
+                const btnGrupo = document.createElement('div');
+                btnGrupo.className = "touch-btn inline-flex items-center bg-purple-100 text-purple-950 border border-purple-300/80 rounded-xl overflow-hidden shadow-xs";
 
-            for (const nomeGrupo in grupos) {
-                const btn = document.createElement('button');
-                btn.className = 'btn-opcao';
-                btn.style.borderColor = '#7b1fa2';
-                btn.style.color = '#7b1fa2';
-                btn.textContent = nomeGrupo;
-                btn.onclick = () => abrirMacroGrupo(nomeGrupo, grupos[nomeGrupo]);
-                container.appendChild(btn);
-            }
+                btnGrupo.innerHTML = `
+                    <button onclick="abrirMacroGrupo('${nomeGrupo}')" class="p-2.5 font-bold text-xs flex-1 text-left flex items-center gap-1.5 truncate">
+                        <i class="fa-solid fa-star text-purple-600 text-xs flex-shrink-0"></i> 
+                        <span class="truncate">${nomeGrupo}</span>
+                    </button>
+                    <button onclick="deletarMacroIndividual('${nomeGrupo}')" title="Excluir macro" class="px-2 py-2.5 bg-purple-200 text-purple-800 active:bg-red-500 active:text-white transition-colors border-l border-purple-300/60">
+                        <i class="fa-solid fa-xmark text-xs"></i>
+                    </button>
+                `;
+
+                container.appendChild(btnGrupo);
+            });
         }
 
-        /* Abrir o Nível 2 com as 5 caixas/falas do Macro selecionado */
-        function abrirMacroGrupo(nomeGrupo, frases) {
+        /* --- MODAL DE GERENCIAMENTO / EXCLUSÃO --- */
+        function abrirModalExcluirMacros() {
+            atualizarModalExcluir();
+            const modal = document.getElementById('modalExcluir');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function fecharModalExcluir() {
+            const modal = document.getElementById('modalExcluir');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function atualizarModalExcluir() {
+            const container = document.getElementById('listaMacrosModal');
+            if (!container) return;
+
+            const grupos = obterMacrosSalvas();
+            const chaves = Object.keys(grupos);
+
+            if (chaves.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-slate-400 font-medium text-xs">
+                        Nenhuma macro cadastrada no seu navegador.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            chaves.forEach(nomeGrupo => {
+                const item = document.createElement('div');
+                item.className = "flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 rounded-xl";
+                item.innerHTML = `
+                    <div class="flex flex-col overflow-hidden mr-2">
+                        <span class="font-extrabold text-slate-800 text-xs truncate">${nomeGrupo}</span>
+                        <span class="text-[10px] text-slate-500">${grupos[nomeGrupo].length} falas salvas</span>
+                    </div>
+                    <button onclick="deletarMacroIndividual('${nomeGrupo}')" class="touch-btn bg-red-100 active:bg-red-600 text-red-700 active:text-white font-bold text-[11px] px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1 flex-shrink-0">
+                        <i class="fa-solid fa-trash text-xs"></i> Apagar
+                    </button>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        /* --- NAVEGAÇÃO ENTRE OS NÍVEIS 1 A 4 --- */
+        function fecharAteNivel(nivel) {
+            if (nivel < 2) document.getElementById('painelNivel2').classList.add('hidden');
+            if (nivel < 3) document.getElementById('painelNivel3').classList.add('hidden');
+            if (nivel < 4) document.getElementById('painelNivel4').classList.add('hidden');
+        }
+
+        function abrirMacroGrupo(nomeGrupo) {
             falar(nomeGrupo);
+            const grupos = obterMacrosSalvas();
+            const frases = grupos[nomeGrupo] || [];
 
-            const n2 = document.getElementById('nivel2');
-            const c2 = document.getElementById('conteudo-nivel2');
-            const labelN2 = document.getElementById('label-nivel2');
+            const p2 = document.getElementById('painelNivel2');
+            const c2 = document.getElementById('conteudoNivel2');
+            const label2 = document.getElementById('labelNivel2');
 
-            document.getElementById('nivel3').style.display = 'none';
-            document.getElementById('nivel4').style.display = 'none';
+            fecharAteNivel(1);
 
-            labelN2.textContent = `Opções de "${nomeGrupo}"`;
+            label2.innerHTML = `<i class="fa-solid fa-star text-purple-600"></i> ${nomeGrupo}`;
             c2.innerHTML = '';
 
             frases.forEach(frase => {
                 const btn = document.createElement('button');
-                btn.className = 'btn-opcao';
-                btn.style.borderColor = '#4a148c';
-                btn.style.color = '#4a148c';
+                btn.className = "touch-btn bg-white active:bg-purple-100 text-purple-950 border border-purple-300 rounded-xl px-3 py-2 font-bold text-xs shadow-xs";
                 btn.textContent = frase;
                 btn.onclick = () => falar(frase);
                 c2.appendChild(btn);
             });
 
-            n2.style.display = 'flex';
+            p2.classList.remove('hidden');
         }
 
-        /* Seleção Padrão das Categorias do Sistema */
-        function selecionarNivel1(opcao) {
-            falar(opcao);
-            
-            const n2 = document.getElementById('nivel2');
-            const c2 = document.getElementById('conteudo-nivel2');
-            const labelN2 = document.getElementById('label-nivel2');
+        function selecionarNivel1(categoria) {
+            falar(categoria);
+            fecharAteNivel(1);
 
-            document.getElementById('nivel3').style.display = 'none';
-            document.getElementById('nivel4').style.display = 'none';
+            const p2 = document.getElementById('painelNivel2');
+            const c2 = document.getElementById('conteudoNivel2');
+            const label2 = document.getElementById('labelNivel2');
 
-            labelN2.textContent = 'Nível 2 - Opções';
+            label2.innerHTML = `<i class="fa-solid fa-list-ul"></i> ${categoria}`;
             c2.innerHTML = '';
 
-            if (opcao === 'Comida') {
+            if (categoria === 'Comida') {
                 c2.innerHTML = `
-                    <button class="btn-opcao" onclick="falar('Água')">Água</button>
-                    <button class="btn-opcao" onclick="selecionarNivel3Biscoito()">Biscoito</button>
-                    <button class="btn-opcao" onclick="falar('Pão')">Pão</button>
-                    <button class="btn-opcao" onclick="falar('Lanche')">Lanche</button>
+                    <button onclick="falar('Quero água')" class="touch-btn bg-white active:bg-cyan-100 text-cyan-950 border border-cyan-300 rounded-xl px-3 py-2 font-bold text-xs">Água</button>
+                    <button onclick="selecionarNivel2Biscoito()" class="touch-btn bg-white active:bg-amber-100 text-amber-950 border border-amber-300 rounded-xl px-3 py-2 font-bold text-xs">Biscoito</button>
+                    <button onclick="falar('Quero pão')" class="touch-btn bg-white active:bg-amber-100 text-amber-950 border border-amber-300 rounded-xl px-3 py-2 font-bold text-xs">Pão</button>
+                    <button onclick="falar('Quero almoçar')" class="touch-btn bg-white active:bg-emerald-100 text-emerald-950 border border-emerald-300 rounded-xl px-3 py-2 font-bold text-xs">Almoço</button>
+                    <button onclick="falar('Quero fruta')" class="touch-btn bg-white active:bg-orange-100 text-orange-950 border border-orange-300 rounded-xl px-3 py-2 font-bold text-xs">Fruta</button>
                 `;
-                n2.style.display = 'flex';
-            } else if (opcao === 'Cumprimento') {
+            } else if (categoria === 'Dor') {
                 c2.innerHTML = `
-                    <button class="btn-opcao" onclick="falar('Bom dia')">Bom dia</button>
-                    <button class="btn-opcao" onclick="falar('Boa tarde')">Boa tarde</button>
-                    <button class="btn-opcao" onclick="falar('Boa noite')">Boa noite</button>
+                    <button onclick="falar('Estou com dor de cabeça')" class="touch-btn bg-white active:bg-rose-100 text-rose-950 border border-rose-300 rounded-xl px-3 py-2 font-bold text-xs">Cabeça</button>
+                    <button onclick="falar('Estou com dor na barriga')" class="touch-btn bg-white active:bg-rose-100 text-rose-950 border border-rose-300 rounded-xl px-3 py-2 font-bold text-xs">Barriga</button>
+                    <button onclick="falar('Preciso do meu remédio')" class="touch-btn bg-white active:bg-purple-100 text-purple-950 border border-purple-300 rounded-xl px-3 py-2 font-bold text-xs">Remédio</button>
                 `;
-                n2.style.display = 'flex';
-            } else if (opcao === 'Resposta') {
+            } else if (categoria === 'Banheiro') {
                 c2.innerHTML = `
-                    <button class="btn-opcao" onclick="falar('Como você está?')">Como você está?</button>
-                    <button class="btn-opcao" onclick="falar('Estou bem, Graças a Deus')">Estou bem, Graças a Deus</button>
+                    <button onclick="falar('Quero fazer xixi')" class="touch-btn bg-white active:bg-cyan-100 text-cyan-950 border border-cyan-300 rounded-xl px-3 py-2 font-bold text-xs">Xixi</button>
+                    <button onclick="falar('Quero escovar os dentes')" class="touch-btn bg-white active:bg-blue-100 text-blue-950 border border-blue-300 rounded-xl px-3 py-2 font-bold text-xs">Escovar Dentes</button>
+                    <button onclick="falar('Quero tomar banho')" class="touch-btn bg-white active:bg-indigo-100 text-indigo-950 border border-indigo-300 rounded-xl px-3 py-2 font-bold text-xs">Tomar Banho</button>
                 `;
-                n2.style.display = 'flex';
-            } else {
-                n2.style.display = 'none';
+            } else if (categoria === 'Cumprimento') {
+                c2.innerHTML = `
+                    <button onclick="falar('Bom dia')" class="touch-btn bg-white text-amber-950 border border-amber-300 rounded-xl px-3 py-2 font-bold text-xs">Bom dia</button>
+                    <button onclick="falar('Boa tarde')" class="touch-btn bg-white text-orange-950 border border-orange-300 rounded-xl px-3 py-2 font-bold text-xs">Boa tarde</button>
+                    <button onclick="falar('Boa noite')" class="touch-btn bg-white text-indigo-950 border border-indigo-300 rounded-xl px-3 py-2 font-bold text-xs">Boa noite</button>
+                    <button onclick="falar('Tudo bem?')" class="touch-btn bg-white text-pink-950 border border-pink-300 rounded-xl px-3 py-2 font-bold text-xs">Tudo bem?</button>
+                `;
+            } else if (categoria === 'Resposta') {
+                c2.innerHTML = `
+                    <button onclick="falar('Estou bem, obrigado')" class="touch-btn bg-white text-emerald-950 border border-emerald-300 rounded-xl px-3 py-2 font-bold text-xs">Estou bem</button>
+                    <button onclick="falar('Não sei')" class="touch-btn bg-white text-slate-800 border border-slate-300 rounded-xl px-3 py-2 font-bold text-xs">Não sei</button>
+                    <button onclick="falar('Por favor')" class="touch-btn bg-white text-purple-950 border border-purple-300 rounded-xl px-3 py-2 font-bold text-xs">Por favor</button>
+                    <button onclick="falar('Obrigado')" class="touch-btn bg-white text-pink-950 border border-pink-300 rounded-xl px-3 py-2 font-bold text-xs">Obrigado</button>
+                `;
             }
+
+            p2.classList.remove('hidden');
         }
 
-        function selecionarNivel3Biscoito() {
+        /* --- EXEMPLOS NÍVEIS 3 E 4 --- */
+        function selecionarNivel2Biscoito() {
             falar('Biscoito');
-            const n3 = document.getElementById('nivel3');
-            const c3 = document.getElementById('conteudo-nivel3');
-            document.getElementById('nivel4').style.display = 'none';
+            fecharAteNivel(2);
+
+            const p3 = document.getElementById('painelNivel3');
+            const c3 = document.getElementById('conteudoNivel3');
 
             c3.innerHTML = `
-                <button class="btn-opcao" onclick="selecionarNivel4Doce()">Doce</button>
-                <button class="btn-opcao" onclick="falar('Biscoito Salgado')">Salgado</button>
+                <button onclick="selecionarNivel3Doce()" class="touch-btn bg-white text-pink-950 border border-pink-300 rounded-xl px-3 py-2 font-bold text-xs">Doce</button>
+                <button onclick="falar('Quero biscoito salgado')" class="touch-btn bg-white text-amber-950 border border-amber-300 rounded-xl px-3 py-2 font-bold text-xs">Salgado</button>
             `;
-            n3.style.display = 'flex';
+
+            p3.classList.remove('hidden');
         }
 
-        function selecionarNivel4Doce() {
+        function selecionarNivel3Doce() {
             falar('Doce');
-            const n4 = document.getElementById('nivel4');
-            const c4 = document.getElementById('conteudo-nivel4');
+            fecharAteNivel(3);
+
+            const p4 = document.getElementById('painelNivel4');
+            const c4 = document.getElementById('conteudoNivel4');
 
             c4.innerHTML = `
-                <button class="btn-opcao" onclick="falar('Biscoito doce recheado')">Recheado</button>
-                <button class="btn-opcao" onclick="falar('Biscoito doce simples')">Simples</button>
+                <button onclick="falar('Quero biscoito doce recheado')" class="touch-btn bg-white text-purple-950 border border-purple-300 rounded-xl px-3 py-2 font-bold text-xs">Recheado</button>
+                <button onclick="falar('Quero biscoito doce simples')" class="touch-btn bg-white text-amber-950 border border-amber-300 rounded-xl px-3 py-2 font-bold text-xs">Simples</button>
             `;
-            n4.style.display = 'flex';
+
+            p4.classList.remove('hidden');
         }
 
-        function focarEscrita() {
-            falar('Escrever');
-            document.getElementById('campoTexto').focus();
-        }
-
-        function enviarTexto() {
-            const campo = document.getElementById('campoTexto');
-            if (campo.value.trim() !== '') {
-                falar(campo.value);
-                campo.value = '';
+        /* --- DIGITAÇÃO MOBILE --- */
+        function enviarTextoMobile() {
+            const el = document.getElementById('campoTextoMobile');
+            if (el && el.value.trim() !== '') {
+                falar(el.value.trim());
             }
         }
 
-        function checarEnter(event) {
-            if (event.key === 'Enter') {
-                enviarTexto();
-            }
+        function limparTextoMobile() {
+            const el = document.getElementById('campoTextoMobile');
+            if (el) el.value = '';
         }
 
-        // Inicializa ao carregar a página
-        carregarMacrosTela();
+        // Initialize App on DOM Load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderizarMacrosNivel1();
+        });
     </script>
 </body>
 </html>
