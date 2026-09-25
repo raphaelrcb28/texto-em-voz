@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>FALA MOBILE</title>
+    <title>Fala Mobile</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -22,16 +22,7 @@
                         sans: ['Inter', 'sans-serif'],
                     },
                     colors: {
-                        mobileBg: '#0f172a',
-                        caa: {
-                            person: '#fef08a',  // Yellow
-                            verb: '#bbf7d0',    // Green
-                            noun: '#fed7aa',    // Orange
-                            adj: '#bfdbfe',     // Blue
-                            social: '#fbcfe8',  // Pink
-                            quest: '#e9d5ff',   // Purple
-                            emotion: '#fecaca'  // Red
-                        }
+                        mobileBg: '#0f172a'
                     }
                 }
             }
@@ -91,7 +82,7 @@
     <!-- Smartphone Frame Container -->
     <div class="w-full h-full max-w-md bg-slate-100 sm:rounded-[36px] sm:shadow-2xl sm:border-8 sm:border-slate-800 flex flex-col overflow-hidden relative border-0">
 
-        <!-- Mobile Header (App Status & Seletor de Voz Geral) -->
+        <!-- Mobile Header -->
         <header class="bg-slate-900 text-white pt-safe px-3.5 py-2.5 flex flex-col gap-2 flex-shrink-0 shadow-md">
             
             <div class="flex items-center justify-between">
@@ -113,14 +104,19 @@
                 </div>
             </div>
 
-            <!-- Seletor de Voz do Sistema -->
-            <div class="bg-slate-800/90 border border-slate-700/80 rounded-xl px-3 py-1.5 flex items-center gap-2 shadow-inner">
-                <i class="fa-solid fa-microphone-lines text-purple-400 text-sm flex-shrink-0"></i>
-                <div class="flex-1 overflow-hidden">
-                    <label for="seletorVoz" class="text-[9px] uppercase font-extrabold text-slate-400 tracking-wider block leading-none mb-0.5">Voz do Sistema (PT-BR):</label>
-                    <select id="seletorVoz" onchange="mudarVozSelecionada()" class="w-full bg-slate-900 text-white font-bold text-xs rounded border border-slate-700 px-1.5 py-1 focus:outline-none focus:border-purple-500 truncate">
-                        <option value="">Carregando vozes...</option>
-                    </select>
+            <!-- Seletor de Voz (Feminino / Masculino PT-BR) -->
+            <div class="bg-slate-800/90 border border-slate-700/80 rounded-xl p-1.5 flex items-center justify-between gap-2 shadow-inner">
+                <div class="flex items-center gap-1.5 pl-1">
+                    <i class="fa-solid fa-microphone-lines text-purple-400 text-xs"></i>
+                    <span class="text-[10px] font-extrabold text-slate-300 uppercase tracking-wider">Voz PT-BR:</span>
+                </div>
+                <div class="grid grid-cols-2 gap-1 w-48">
+                    <button id="btnVozFem" onclick="selecionarGeneroVoz('feminino')" class="touch-btn bg-purple-600 text-white font-extrabold text-[11px] py-1 px-2 rounded-lg flex items-center justify-center gap-1 shadow-xs">
+                        <i class="fa-solid fa-venus text-xs"></i> Feminino
+                    </button>
+                    <button id="btnVozMasc" onclick="selecionarGeneroVoz('masculino')" class="touch-btn bg-slate-700 text-slate-300 font-extrabold text-[11px] py-1 px-2 rounded-lg flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-mars text-xs"></i> Masculino
+                    </button>
                 </div>
             </div>
         </header>
@@ -128,7 +124,7 @@
         <!-- Main Content Area -->
         <main class="flex-1 flex flex-col min-h-0 overflow-hidden relative bg-slate-100">
 
-            <!-- TAB 1: VOLTAR (VOLTAR BOARD) -->
+            <!-- TAB 1: VOLTAR (MAIN BOARD) -->
             <div id="tabPrancha" class="tab-page active flex-1 flex flex-col p-2.5 gap-2 min-h-0 overflow-hidden">
 
                 <!-- Color Key Category Strip -->
@@ -300,9 +296,9 @@
 
         </main>
 
-        <!-- QUICK EXPRESS BUTTONS BAR (COM O NOVO SELETOR DE VOZ PERFIL) -->
+        <!-- QUICK EXPRESS BUTTONS BAR (Sem o botão 'Última Fala') -->
         <div class="bg-slate-200/90 backdrop-blur-xs p-1.5 border-t border-slate-300 flex-shrink-0">
-            <div class="grid grid-cols-4 gap-1.5">
+            <div class="grid grid-cols-3 gap-1.5">
                 <button onclick="falar('SIM')" class="touch-btn bg-emerald-600 text-white font-black text-xs py-2 rounded-xl shadow-xs flex items-center justify-center gap-1">
                     <i class="fa-solid fa-check text-sm"></i> SIM
                 </button>
@@ -311,14 +307,6 @@
                 </button>
                 <button onclick="falar('Preciso de ajuda')" class="touch-btn bg-amber-600 text-white font-black text-[11px] py-2 rounded-xl shadow-xs flex items-center justify-center gap-1">
                     <i class="fa-solid fa-hand text-xs"></i> Ajuda
-                </button>
-                
-                <!-- BOTÃO SELETOR DE PERFIL DE VOZ (Substitui o botão Última Fala) -->
-                <button onclick="abrirModalPerfilVoz()" class="touch-btn bg-purple-700 text-white font-black text-[10px] leading-tight py-2 rounded-xl shadow-xs flex flex-col items-center justify-center gap-0.5">
-                    <div class="flex items-center gap-1">
-                        <i class="fa-solid fa-[#100] fa-user-gear text-xs"></i>
-                        <span class="font-bold">Perfil Voz</span>
-                    </div>
                 </button>
             </div>
         </div>
@@ -339,56 +327,6 @@
             </button>
         </nav>
 
-    </div>
-
-    <!-- MODAL DE SELEÇÃO DE PERFIL DE VOZ (Feminino/Masculino & Adulto/Criança) -->
-    <div id="modalPerfilVoz" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl max-w-md w-full p-4 space-y-4 border border-slate-200">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-                <div class="flex items-center gap-2 text-purple-700">
-                    <i class="fa-solid fa-user-gear text-base"></i>
-                    <h3 class="font-extrabold text-sm text-slate-900">Escolher Perfil de Voz</h3>
-                </div>
-                <button onclick="fecharModalPerfilVoz()" class="text-slate-400 p-1">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <!-- Opções de Perfil de Voz -->
-            <div class="space-y-3">
-                <p class="text-xs text-slate-600 font-medium">Selecione o perfil desejado para a voz do aplicativo em Português (Brasil):</p>
-
-                <div class="grid grid-cols-2 gap-2">
-                    <!-- Feminino Adulto -->
-                    <button onclick="definirPerfilVoz('fem_adulto')" class="touch-btn p-3 bg-purple-50 hover:bg-purple-100 border-2 border-purple-200 rounded-xl flex flex-col items-center justify-center gap-1 text-purple-900 font-bold text-xs">
-                        <i class="fa-solid fa-person-dress text-lg text-purple-600"></i>
-                        <span>Feminino Adulto</span>
-                    </button>
-
-                    <!-- Masculino Adulto -->
-                    <button onclick="definirPerfilVoz('masc_adulto')" class="touch-btn p-3 bg-blue-50 hover:bg-blue-100 border-2 border-blue-200 rounded-xl flex flex-col items-center justify-center gap-1 text-blue-900 font-bold text-xs">
-                        <i class="fa-solid fa-person text-lg text-blue-600"></i>
-                        <span>Masculino Adulto</span>
-                    </button>
-
-                    <!-- Criança / Menina -->
-                    <button onclick="definirPerfilVoz('fem_crianca')" class="touch-btn p-3 bg-pink-50 hover:bg-pink-100 border-2 border-pink-200 rounded-xl flex flex-col items-center justify-center gap-1 text-pink-900 font-bold text-xs">
-                        <i class="fa-solid fa-child-dress text-lg text-pink-600"></i>
-                        <span>Criança (Menina)</span>
-                    </button>
-
-                    <!-- Criança / Menino -->
-                    <button onclick="definirPerfilVoz('masc_crianca')" class="touch-btn p-3 bg-amber-50 hover:bg-amber-100 border-2 border-amber-200 rounded-xl flex flex-col items-center justify-center gap-1 text-amber-900 font-bold text-xs">
-                        <i class="fa-solid fa-child text-lg text-amber-600"></i>
-                        <span>Criança (Menino)</span>
-                    </button>
-                </div>
-            </div>
-
-            <button onclick="fecharModalPerfilVoz()" class="touch-btn w-full bg-slate-200 active:bg-slate-300 text-slate-800 font-bold text-xs py-2.5 rounded-xl">
-                Fechar
-            </button>
-        </div>
     </div>
 
     <!-- MODAL DE EXCLUSÃO DE MACROS (CELULAR) -->
@@ -426,13 +364,12 @@
 
     <script>
         // Global State Variables
-        let vozesDisponiveis = [];
+        let vozesPTBR = [];
         let vozSelecionada = null;
-        let pitchAtual = 1.0;
-        let rateAtual = 0.92;
-        const STORAGE_KEY = 'comunicacao_mobile_macros_v1';
+        let generoVozAtual = 'feminino'; // 'feminino' ou 'masculino'
+        const STORAGE_KEY = 'fala_mobile_macros_v1';
 
-        // Estrutura de dados para a Voltar Padrão
+        // Estrutura de dados para a Prancha Padrão
         const dadosPrancha = {
             Comida: {
                 "Quero comer": ["Arroz e Feijão", "Lanche/Salgado", "Fruta", "Doce", "Sopa"],
@@ -458,108 +395,54 @@
             }
         };
 
-        /* --- SÍNTESE DE VOZ --- */
+        /* --- SÍNTESE E SELEÇÃO DE VOZ (FEMININO / MASCULINO PT-BR) --- */
         function carregarVozes() {
             if (!('speechSynthesis' in window)) return;
 
-            vozesDisponiveis = window.speechSynthesis.getVoices();
-            const seletor = document.getElementById('seletorVoz');
-            if (!seletor) return;
+            const todasVozes = window.speechSynthesis.getVoices();
+            // Filtrar apenas vozes em Português do Brasil ou Português geral
+            vozesPTBR = todasVozes.filter(v => v.lang.includes('pt-BR') || v.lang.includes('pt_BR') || v.lang.startsWith('pt'));
 
-            seletor.innerHTML = '';
-
-            if (vozesDisponiveis.length === 0) {
-                seletor.innerHTML = '<option value="">Voz padrão do sistema</option>';
-                return;
-            }
-
-            vozesDisponiveis.sort((a, b) => {
-                const aPt = a.lang.toLowerCase().startsWith('pt');
-                const bPt = b.lang.toLowerCase().startsWith('pt');
-                if (aPt && !bPt) return -1;
-                if (!aPt && bPt) return 1;
-                return a.name.localeCompare(b.name);
-            });
-
-            vozesDisponiveis.forEach((voz, index) => {
-                const option = document.createElement('option');
-                option.value = index;
-                option.textContent = `${voz.name} (${voz.lang})`;
-                
-                if (voz.lang.includes('pt-BR') || voz.lang.includes('pt_BR')) {
-                    if (!vozSelecionada) {
-                        vozSelecionada = voz;
-                        option.selected = true;
-                    }
-                }
-                seletor.appendChild(option);
-            });
-
-            if (!vozSelecionada && vozesDisponiveis.length > 0) {
-                vozSelecionada = vozesDisponiveis[0];
-            }
+            atualizarVozPorGenero();
         }
 
-        function mudarVozSelecionada() {
-            const seletor = document.getElementById('seletorVoz');
-            if (!seletor) return;
+        function selecionarGeneroVoz(genero) {
+            generoVozAtual = genero;
 
-            const idx = seletor.value;
-            if (idx !== "" && vozesDisponiveis[idx]) {
-                vozSelecionada = vozesDisponiveis[idx];
-                falar("Voz alterada com sucesso");
+            const btnFem = document.getElementById('btnVozFem');
+            const btnMasc = document.getElementById('btnVozMasc');
+
+            if (genero === 'feminino') {
+                btnFem.className = "touch-btn bg-purple-600 text-white font-extrabold text-[11px] py-1 px-2 rounded-lg flex items-center justify-center gap-1 shadow-xs";
+                btnMasc.className = "touch-btn bg-slate-700 text-slate-300 font-extrabold text-[11px] py-1 px-2 rounded-lg flex items-center justify-center gap-1";
+            } else {
+                btnMasc.className = "touch-btn bg-purple-600 text-white font-extrabold text-[11px] py-1 px-2 rounded-lg flex items-center justify-center gap-1 shadow-xs";
+                btnFem.className = "touch-btn bg-slate-700 text-slate-300 font-extrabold text-[11px] py-1 px-2 rounded-lg flex items-center justify-center gap-1";
+            }
+
+            atualizarVozPorGenero();
+            falar(`Voz ${genero} selecionada`);
+        }
+
+        function atualizarVozPorGenero() {
+            if (vozesPTBR.length === 0) return;
+
+            // Busca por palavras-chave comuns em nomes de sintaxe para identificar voz masculina ou feminina
+            const nomesMasculinos = ['daniel', 'ricardo', 'felipe', 'thago', 'antonio', 'male', 'homem', 'lucas', 'george'];
+            
+            if (generoVozAtual === 'masculino') {
+                const vozMasc = vozesPTBR.find(v => nomesMasculinos.some(nome => v.name.toLowerCase().includes(nome)));
+                vozSelecionada = vozMasc || vozesPTBR[0];
+            } else {
+                // Feminina (padrão caso não ache termo masculino específico)
+                const vozFem = vozesPTBR.find(v => !nomesMasculinos.some(nome => v.name.toLowerCase().includes(nome)));
+                vozSelecionada = vozFem || vozesPTBR[0];
             }
         }
 
         if ('speechSynthesis' in window) {
             window.speechSynthesis.onvoiceschanged = carregarVozes;
             carregarVozes();
-        }
-
-        /* --- PERFIL DE VOZ (MODAL) --- */
-        function abrirModalPerfilVoz() {
-            const modal = document.getElementById('modalPerfilVoz');
-            if (modal) modal.classList.remove('hidden');
-        }
-
-        function fecharModalPerfilVoz() {
-            const modal = document.getElementById('modalPerfilVoz');
-            if (modal) modal.classList.add('hidden');
-        }
-
-        function definirPerfilVoz(perfil) {
-            const ptVozes = vozesDisponiveis.filter(v => v.lang.toLowerCase().startsWith('pt'));
-
-            switch(perfil) {
-                case 'fem_adulto':
-                    pitchAtual = 1.0;
-                    rateAtual = 0.92;
-                    // Procura por termos comuns de voz feminina
-                    vozSelecionada = ptVozes.find(v => v.name.toLowerCase().includes('luciana') || v.name.toLowerCase().includes('maria') || v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('zira') || v.name.toLowerCase().includes('francisca')) || ptVozes[0] || vozesDisponiveis[0];
-                    falar("Perfil de voz feminina adulta selecionado");
-                    break;
-                case 'masc_adulto':
-                    pitchAtual = 0.85;
-                    rateAtual = 0.90;
-                    // Procura por termos comuns de voz masculina
-                    vozSelecionada = ptVozes.find(v => v.name.toLowerCase().includes('daniel') || v.name.toLowerCase().includes('felipe') || v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('ricardo') || v.name.toLowerCase().includes('antonio')) || ptVozes[0] || vozesDisponiveis[0];
-                    falar("Perfil de voz masculina adulta selecionado");
-                    break;
-                case 'fem_crianca':
-                    pitchAtual = 1.45; // Agudo para simular voz de criança
-                    rateAtual = 1.05;
-                    vozSelecionada = ptVozes.find(v => v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('luciana')) || ptVozes[0] || vozesDisponiveis[0];
-                    falar("Perfil de voz de menina selecionado");
-                    break;
-                case 'masc_crianca':
-                    pitchAtual = 1.35; // Agudo para simular voz de criança
-                    rateAtual = 1.05;
-                    vozSelecionada = ptVozes.find(v => v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('daniel')) || ptVozes[0] || vozesDisponiveis[0];
-                    falar("Perfil de voz de menino selecionado");
-                    break;
-            }
-
-            fecharModalPerfilVoz();
         }
 
         function falar(texto) {
@@ -577,8 +460,8 @@
                     utterance.lang = 'pt-BR';
                 }
 
-                utterance.rate = rateAtual;
-                utterance.pitch = pitchAtual;
+                utterance.rate = 0.92;
+                utterance.pitch = (generoVozAtual === 'feminino') ? 1.1 : 0.85; // Ajuste suave no pitch para reforçar a distinção de voz
 
                 const indicator = document.getElementById('speechIndicator');
 
@@ -631,7 +514,7 @@
             }
         }
 
-        /* --- VOLTAR E NÍVEIS --- */
+        /* --- PRANCHA E NÍVEIS --- */
         function fecharAteNivel(nivel) {
             if (nivel < 2) {
                 const p2 = document.getElementById('painelNivel2');
